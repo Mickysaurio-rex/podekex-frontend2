@@ -1,65 +1,72 @@
-// Mauricio Form
+import API from "./../config/pokeApi";
+import * as React from "react";
+import Card from "@mui/material/Card";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import { red } from "@mui/material/colors";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from "@mui/icons-material/Share";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+export const PokeCard = (props) => {
+  const { idPokemon } = props;
+  const [name, setName] = React.useState({});
+  const [imagePokemon, setImagePokemon] = React.useState("");
 
-import * as yup from "yup";
-import { useFormik } from "formik";
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import API from "./../config/api";
-
-const validationSchema = yup.object({
-  name: yup.string("Enter your name").required("Name is required"),
-  id_pokemon: yup
-    .string("Enter your id pokemon")
-    .required("Id Pokemon is required"),
-});
-
-export const TrainerForm = () => {
-const createTrainer = async (body) => {
-    const currentBody = {
-        ...body,
-        nombre: body.name
-    }
-    debugger;
-    return await API.post('/trainer',currentBody);
-}
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      id_pokemon: "",
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {      
-      createTrainer(values);
-    },
-  });
+  const getPokemon = async () => {
+    const responsePokemon = await API.get(`/${idPokemon}`);
+    const { data } = responsePokemon;
+    const { name: pokemonName, sprites } = data;
+    const { front_default } = sprites;
+    setName(pokemonName);
+    setImagePokemon(front_default);
+    console.log(sprites);
+  };
+  React.useEffect(() => {
+    getPokemon();
+  }, [idPokemon]);
 
   return (
-    <div>
-      <form onSubmit={formik.handleSubmit}>
-        <TextField
-          fullWidth
-          id="name"
-          name="name"
-          label="Name"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          error={formik.touched.name && Boolean(formik.errors.name)}
-          helperText={formik.touched.name && formik.errors.name}
-        />
-        <TextField
-          fullWidth
-          id="id_pokemon"
-          name="id_pokemon"
-          label="Id Pokemon"          
-          value={formik.values.id_pokemon}
-          onChange={formik.handleChange}
-          error={formik.touched.id_pokemon && Boolean(formik.errors.id_pokemon)}
-          helperText={formik.touched.id_pokemon && formik.errors.id_pokemon}
-        />
-        <Button class="btn-login" color="primary" variant="contained" fullWidth type="submit">
-          Crear
-        </Button>
-      </form>
-    </div>
+    <Card sx={{ maxWidth: 345 }}>
+      <CardHeader
+        avatar={
+          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+            R
+          </Avatar>
+        }
+        action={
+          <IconButton aria-label="settings">
+            <MoreVertIcon />
+          </IconButton>
+        }
+        title="Shrimp and Chorizo Paella"
+        subheader="September 14, 2016"
+      />
+      <CardMedia
+        component="img"
+        height="194"
+        image={imagePokemon}
+        alt="Paella dish"
+      />
+      <CardContent>
+        <Typography variant="body2" color="text.secondary">
+          This impressive paella is a perfect party dish and a fun meal to cook
+          together with your guests. Add 1 cup of frozen peas along with the
+          mussels, if you like.
+        </Typography>
+      </CardContent>
+      <CardActions disableSpacing>
+        <IconButton aria-label="add to favorites">
+          <FavoriteIcon />
+        </IconButton>
+        <IconButton aria-label="share">
+          <ShareIcon />
+        </IconButton>
+      </CardActions>
+    </Card>
   );
 };

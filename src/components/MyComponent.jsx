@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import API from "./../config/api";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import { store } from './store/store'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore } from "redux-persist";
+const root = ReactDOM.createRoot(document.getElementById('root'));
+let persistor = persistStore(store);
+root.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+      <App />
+      </PersistGate>
+    </Provider>
+  </React.StrictMode>
+);
 
-export const MyComponent = (props) => {
-  const { name, setName } = props;
-  const [trainers, setTrainers] = useState({});
-
-  useEffect(() => {
-    getTrainers();
-  }, []);
-
-  setName('Wilker');
-  const getTrainers = async () => {
-    const trainersResponse = await API.get("/trainers");
-    const { data } = trainersResponse;
-    setTrainers(data.trainers)
-    console.log("Testing", trainers);
-  };
-
-  return (
-    <div>
-      <h1>Hello World {trainers[0]?.nombre}</h1>
-    </div>
-  );
-};
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
